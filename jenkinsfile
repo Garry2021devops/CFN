@@ -30,14 +30,14 @@ pipeline {
 				sh 'npm install'
 				sh 'apt-get update'
 				sh 'apt install python3-pip -y'
-				sh 'python -m pip install awscliv2'
+				sh 'pip3 install awscli --upgrade'
 			}
 		}
 		stage('cloudformation'){
 			steps{ withAWS(credentials: '06b5a459-1c49-47fe-ae48-cbec3c35b6c7', region: 'ap-southeast-2') {
 			sh'pwd'
 			sh'ls'
-			sh'aws cloudformation deploy --template/var/jenkins_home/workspace/cfn/lambdas3.yml  --stack-name testcfn2'
+			sh'aws cloudformation deploy --template-file /var/jenkins_home/workspace/cfn/lambdas3.yml  --stack-name testcfn2'
 		}
 		}
 	}
@@ -59,7 +59,7 @@ pipeline {
 			steps {
 				echo "Installing AWS CLI ..."
 	
-				sh 'pip3 install awscli --upgrade'
+				
 			}
 		}
 		stage('Upload to S3') {
