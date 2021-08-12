@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: create articutlure for recommendation system
+Resources:
+  lambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: lambda
+      FunctionName: lambdatest123
+      Handler: index.handler
+      MemorySize: 256
+      Role: arn:aws:iam::989713268372:role/service-role/dataextraction
+      Runtime: nodejs14.x
+      Timeout: 600
+      Code:
+        ZipFile: |
+          exports.handler = function(event, context, callback) {
+          var response = {
+          statusCode: 200,
+          headers: {
+              'Content-Type': 'text/html; charset=utf-8'
+          },
+          body: '<p>Bonjour au monde!</p>'
+          }
+          callback(null, response)
+          }
+  S3Buckettest:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: recommendationssystembucketdata123456
+

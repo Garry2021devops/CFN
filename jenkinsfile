@@ -1,0 +1,82 @@
+pipeline {
+	agent {
+		docker {
+			image 'node:14.17.0'
+		}
+	}
+
+	environment {
+		CI = 'true'
+		FUNCTION_NAME = 'lambdatest123'
+		FILE_PATH = '/var/jenkins_home/workspace/job-web-scraping-uat/lambdatest123.zip'
+		FUNCTION_ARN = 'arn:aws:lambda:ap-southeast-2:026559016816:function:lambdatest123'
+		REGION = 'ap-southeast-2'
+		BUCKET_NAME = 's3://recommendationssystembucketdata123456'
+		BUCKET = 'recommendationssystembucketdata123456'
+	}
+
+	options {
+		// Keep maximum 10 archievd artifacts
+		buildDiscarder(logRotator(numToKeepStr:'10', artifactNumToKeepStr:'10'))
+		// No simultaneous builds
+		disableConcurrentBuilds()
+		durabilityHint('MAX_SURVIVABILITY') // PERFORMANCE_OPTIMIZED or SURVIVABLE_NONATOMIC
+	}
+
+	stages {
+		stage('Install Package') {
+			steps {
+				echo 'Install...'
+				sh 'npm install'
+				sh 'apt-get update'
+				sh 'apt install python3-pip -y'
+			}
+		}
+		stage('cloudformation'){withAWS(credentials: '06b5a459-1c49-47fe-ae48-cbec3c35b6c7', region: 'ap-southeast-2') {
+			sh'aws cloudformation deploy --template ./lambdas3.yml  --stack-name testcfn2 '
+		}
+	}
+		stage('Installl Zip') {
+			steps {
+				echo 'Installing zip...'
+				sh 'apt-get update'
+				sh 'apt-get install zip'
+			}
+		}
+		stage('Zip Deployment Package') {
+			steps {
+				echo 'Ziping...'
+				sh 'rm -rf lambdatest123'
+				sh 'zip -q -r lambdatest123 ./'
+			}
+		}
+		stage('Install AWS CLI') {
+			steps {
+				echo "Installing AWS CLI ..."
+	
+				sh 'pip3 install awscli --upgrade'
+			}
+		}
+		stage('Upload to S3') {
+			steps {
+				echo 'Starting to upload...'
+				withAWS(credentials: '06b5a459-1c49-47fe-ae48-cbec3c35b6c7', region: 'ap-southeast-2') {
+					sh 'aws s3 rm "${BUCKET_NAME}"'
+					sh 'aws s3 cp "${FILE_PATH}" "${BUCKET_NAME}" --acl public-read --region ap-southeast-2'
+				}
+			}
+		}
+		stage('Update Lambda Function') {
+			steps {
+				echo 'Updating Lambda function...'
+				withAWS(credentials: '06b5a459-1c49-47fe-ae48-cbec3c35b6c7', region: 'ap-southeast-2') { // c7b84a61-c4e3-4baf-b5f1-00b59a3bf314
+					sh 'aws lambda  update-function-code \
+					 --function-name ${FUNCTION_NAME} \
+					 --s3-bucket ${BUCKET} \
+					 --s3-key ${FUNCTION_NAME}.zip \
+					 --region ${REGION}'
+					 // --zip-file fileb:// 
+				}
+			}
+		}
+	}
