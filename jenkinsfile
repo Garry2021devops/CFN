@@ -8,7 +8,7 @@ pipeline {
 	environment {
 		CI = 'true'
 		FUNCTION_NAME = 'lambdatest123'
-		FILE_PATH = '/var/jenkins_home/workspace/job-web-scraping-uat/lambdatest123.zip'
+		FILE_PATH = '/var/jenkins_home/workspace/cfn/lambdatest123.zip'
 		FUNCTION_ARN = 'arn:aws:lambda:ap-southeast-2:026559016816:function:lambdatest123'
 		REGION = 'ap-southeast-2'
 		BUCKET_NAME = 's3://recommendationssystembucketdata123456'
