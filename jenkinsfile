@@ -37,7 +37,7 @@ pipeline {
 			steps{ withAWS(credentials: 'b2fc0add-860f-4145-8935-e80e357da19b', region: 'ap-southeast-2') {
 			sh'pwd'
 			sh'ls'
-			sh'aws cloudformation deploy --template-file /var/jenkins_home/workspace/cfn/lambdas3.yml  --stack-name testcfn2>/dev/null'
+			sh'aws cloudformation deploy --template-file /var/jenkins_home/workspace/cfn/lambdas3.yml  --stack-name testcfn2 > /dev/null'
 			
 		}
 		}
