@@ -27,4 +27,9 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: recommendationssystembucketdata123456
+   S3Buckettest:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: recommendationssystembucketdata123456
+
 
