@@ -37,53 +37,16 @@ pipeline {
 			steps{ withAWS(credentials: 'b2fc0add-860f-4145-8935-e80e357da19b', region: 'ap-southeast-2') {
 			sh'pwd'
 			sh'ls'
-			sh'aws cloudformation deploy --template-file /var/jenkins_home/workspace/cfn/lambdas3.yml  --stack-name testcfn2 &>/dev/null'
+			sh'aws cloudformation deploy --template-file /var/jenkins_home/workspace/cfn/lambdas3.yml  --stack-name testcfn2'
 			
 		}
 		}
 	}
-		stage('Installl Zip') {
-			steps {
-				echo 'Installing zip...'
-				sh 'apt-get update'
-				sh 'apt-get install zip'
-			}
-		}
-		stage('Zip Deployment Package') {
-			steps {
-				echo 'Ziping...'
-				sh 'rm -rf lambdatest123'
-				sh 'zip -q -r lambdatest123 ./'
-			}
-		}
-		stage('Install AWS CLI') {
-			steps {
-				echo "Installing AWS CLI ..."
-	
-				
-			}
-		}
-		stage('Upload to S3') {
-			steps {
-				echo 'Starting to upload...'
-				withAWS(credentials: 'b2fc0add-860f-4145-8935-e80e357da19b', region: 'ap-southeast-2') {
-					sh 'aws s3 rm "${BUCKET_NAME}"'
-					sh 'aws s3 cp "${FILE_PATH}" "${BUCKET_NAME}" --acl public-read --region ap-southeast-2'
-				}
-			}
-		}
-		stage('Update Lambda Function') {
-			steps {
-				echo 'Updating Lambda function...'
-				withAWS(credentials: 'b2fc0add-860f-4145-8935-e80e357da19b', region: 'ap-southeast-2') { // c7b84a61-c4e3-4baf-b5f1-00b59a3bf314
-					sh 'aws lambda  update-function-code \
-					 --function-name ${FUNCTION_NAME} \
-					 --s3-bucket ${BUCKET} \
-					 --s3-key ${FUNCTION_NAME}.zip \
-					 --region ${REGION}'
-					 // --zip-file fileb:// 
-				}
-			}
+		
+		
+		
+		
+		
 		}
 	}
 }
