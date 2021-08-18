@@ -45,7 +45,7 @@ Resources:
     Type: AWS::Lambda::Permission
     Properties: 
       FunctionName: 
-        Ref: "LambdaFunction"
+        Ref: "lambdaFunction"
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: 
