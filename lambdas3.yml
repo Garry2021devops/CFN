@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: CloudFormation for recommendation system UAT
-Parameter:
+Parameters:
   LambdaFunction1:
     Type: String
     Default: data-extraction
