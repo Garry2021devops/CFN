@@ -38,7 +38,7 @@ Resources:
         - 
           Arn: 
             Fn::GetAtt: 
-              - "LambdaFunction"
+              - "lambdaFunction"
               - "Arn"
           Id: "TargetFunctionV1"
   PermissionForEventsToInvokeLambda: 
