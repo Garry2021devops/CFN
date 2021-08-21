@@ -1,55 +1,75 @@
-
 AWSTemplateFormatVersion: 2010-09-09
-Description: create articutlure for recommendation system
+Description: CloudFormation for recommendation system UAT
+Parameter:
+  LambdaFunction1:
+    Type: String
+    Default: data-extraction
+  S3Bucket:
+    Description: use to upload lambda function zip 
+    Type: String
+    Default: jr-recommendation-system-code-zip
+  ScheduleExpression:
+      Description: time to run lambda
+      Type: String
+      Default: cron(0 2 * * ? *)
 Resources:
-  lambdaFunction:
+  ExecutionLambda:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda-recommendation-system
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
+  lambdaFunction1:
     Type: AWS::Lambda::Function
     Properties:
-      Description: lambda
-      FunctionName: lambdatest
-      Handler: index.handler
+      Description: Lambda-extraction 
+      FunctionName: !Ref LambdaFunction1
+      Handler: src/mongodb_to_s3.run
       MemorySize: 256
-      Role: arn:aws:iam::989713268372:role/service-role/dataextraction
-      Runtime: nodejs14.x
+      Role: !GetAtt 'ExecutionLambda.Arn'
+      Runtime: python3.8
       Timeout: 600
       Code:
         ZipFile: |
-          exports.handler = function(event, context, callback) {
-          var response = {
-          statusCode: 200,
-          headers: {
-              'Content-Type': 'text/html; charset=utf-8'
-          },
-          body: '<p>Bonjour au monde!</p>'
-          }
-          callback(null, response)
-          }
-  S3Buckettest:
+         def my_handler(event, context):
+            message = 'Hello Lambda World!'
+            return message
+
+  S3BucketZip:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: recommendationssystembucketdata123456
+      BucketName: !Ref S3Bucket
+
   ScheduledRule: 
     Type: AWS::Events::Rule
     Properties: 
-      Description: "ScheduledRule"
-      ScheduleExpression: "rate(10 minutes)"
+      Description: "ScheduledRule for lambada data-extraction"
+      ScheduleExpression: !Ref ScheduleExpression
       State: "ENABLED"
       Targets: 
         - 
           Arn: 
             Fn::GetAtt: 
-              - "lambdaFunction"
+              - "lambdaFunction1"
               - "Arn"
           Id: "TargetFunctionV1"
+  
   PermissionForEventsToInvokeLambda: 
     Type: AWS::Lambda::Permission
     Properties: 
       FunctionName: 
-        Ref: "lambdaFunction"
+        Ref: "lambdaFunction1"
       Action: "lambda:InvokeFunction"
       Principal: "events.amazonaws.com"
       SourceArn: 
         Fn::GetAtt: 
           - "ScheduledRule"
           - "Arn"
-
