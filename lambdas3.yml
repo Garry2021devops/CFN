@@ -7,7 +7,7 @@ Parameters:
   S3Bucket:
     Description: use to upload lambda function zip 
     Type: String
-    Default: jr-recommendation-system-code-zip
+    Default: recommendationssystembucketdata1234567
   ScheduleExpression:
       Description: time to run lambda
       Type: String
